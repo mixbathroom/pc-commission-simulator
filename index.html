@@ -392,6 +392,8 @@
     .header h1 { font-size: 13px; }
     .header span { font-size: 10px; }
     .print-btn { display: none !important; }
+    .help-btn  { display: none !important; }
+    .help-overlay { display: none !important; }
     .chain-tabs { display: none !important; }
     .branch-card { background:#f8f8f8 !important; border-color:#ccc !important; }
     .branch-card select { display: none !important; }
@@ -473,6 +475,72 @@
   .helper-row .ach { font-family: 'IBM Plex Mono', monospace; font-weight: 700; }
   .helper-row .ach.pass { color: var(--green); }
   .helper-row .ach.fail { color: var(--red); }
+
+  /* ── Help Button & Modal ─────────────────────── */
+  .help-btn {
+    padding: 8px 14px; border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    color: white; font-size: 13px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .help-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); }
+
+  .help-overlay {
+    display: none; position: fixed; inset: 0; z-index: 999;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  .help-overlay.open { display: flex; }
+  .help-modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; width: 100%; max-width: 520px;
+    max-height: 88vh; overflow-y: auto;
+  }
+  .help-modal-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; background: var(--surface); border-radius: 16px 16px 0 0; z-index: 1;
+  }
+  .help-modal-header h2 { font-size: 15px; font-weight: 800; color: white; }
+  .help-close {
+    width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text-muted); font-size: 16px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .help-close:hover { color: white; border-color: var(--red); }
+  .help-body { padding: 20px; }
+  .help-step {
+    display: flex; gap: 14px; margin-bottom: 20px; align-items: flex-start;
+  }
+  .help-step:last-child { margin-bottom: 0; }
+  .help-num {
+    width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: white;
+  }
+  .help-step-body { flex: 1; }
+  .help-step-title { font-size: 13px; font-weight: 700; color: white; margin-bottom: 4px; }
+  .help-step-desc { font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+  .help-step-desc b { color: var(--accent); font-weight: 600; }
+  .help-step-desc .tag {
+    display: inline-block; padding: 1px 7px; border-radius: 4px;
+    font-size: 10px; font-weight: 700; font-family: 'IBM Plex Mono', monospace;
+    margin: 1px 2px; vertical-align: middle;
+  }
+  .tag-orange { background: rgba(232,92,26,0.2); color: #f0862a; border: 1px solid rgba(232,92,26,0.3); }
+  .tag-blue   { background: rgba(37,99,235,0.2);  color: #60a5fa; border: 1px solid rgba(37,99,235,0.3); }
+  .tag-green  { background: rgba(63,185,80,0.2);  color: #3fb950; border: 1px solid rgba(63,185,80,0.3); }
+  .tag-red    { background: rgba(248,81,73,0.2);  color: #f85149; border: 1px solid rgba(248,81,73,0.3); }
+  .help-divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .help-note {
+    background: var(--surface2); border-radius: 10px; padding: 12px 14px;
+    border-left: 3px solid var(--accent); margin-top: 4px;
+    font-size: 11px; color: var(--text-muted); line-height: 1.7;
+  }
 </style>
 </head>
 <body>
@@ -482,9 +550,132 @@
     <h1>PC Commission Simulator 2569</h1>
     <span>จำลองการคำนวณค่าตอบแทน PC Modern Trade · มีผลบังคับใช้ 1 มิ.ย. 2569</span>
   </div>
+  <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    วิธีใช้งาน
+  </button>
   <button class="print-btn" onclick="window.print()">
     🖨️ <span style="color:#ffffff !important">พิมพ์ / Save PDF</span>
   </button>
+</div>
+
+<!-- ═══ HELP MODAL ═══ -->
+<div id="helpOverlay" class="help-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="help-modal">
+    <div class="help-modal-header">
+      <h2>📖 วิธีการใช้งาน PC Commission Simulator</h2>
+      <button class="help-close" onclick="document.getElementById('helpOverlay').classList.remove('open')">✕</button>
+    </div>
+    <div class="help-body">
+
+      <!-- Step 1 -->
+      <div class="help-step">
+        <div class="help-num" style="background:linear-gradient(135deg,#e85c1a,#f0862a)">1</div>
+        <div class="help-step-body">
+          <div class="help-step-title">เลือก Chain ห้าง</div>
+          <div class="help-step-desc">
+            กดปุ่ม Chain ด้านบน <span class="tag tag-orange">🏠 DoHome</span> <span class="tag tag-blue">🏪 HomeHub</span> <span class="tag tag-blue">🔨 HomeOne</span> <span class="tag tag-green">🛒 HomeShop</span><br>
+            ระบบจะโหลด <b>อัตรา Commission</b> ของแต่ละห้างให้อัตโนมัติ
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="help-step">
+        <div class="help-num" style="background:linear-gradient(135deg,#2563eb,#60a5fa)">2</div>
+        <div class="help-step-body">
+          <div class="help-step-title">เลือกสาขา</div>
+          <div class="help-step-desc">
+            กด Dropdown <b>เลือกสาขา</b> แล้วเลือกชื่อสาขาของตัวเอง<br>
+            ระบบจะ <b>ตั้ง Store Size อัตโนมัติ</b> พร้อมแสดง<br>
+            <span class="tag tag-orange">BG Size</span> — Size ที่ Beger กำหนด<br>
+            <span class="tag tag-green">Market Size</span> — Size ของตลาด
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="help-step">
+        <div class="help-num" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">3</div>
+        <div class="help-step-body">
+          <div class="help-step-title">ตรวจสอบ / ปรับ Store Size</div>
+          <div class="help-step-desc">
+            ปุ่ม <span class="tag tag-blue">S</span> <span class="tag tag-blue">M</span> <span class="tag tag-blue">L</span> <span class="tag tag-blue">XL</span> คือ <b>BG Store Size</b><br>
+            ใช้คำนวณ <b>Incentive</b> — ถ้าระบบเลือกให้แล้วไม่ต้องแก้<br>
+            สามารถกดเปลี่ยนเองได้ถ้าต้องการ
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="help-step">
+        <div class="help-num" style="background:linear-gradient(135deg,#059669,#34d399)">4</div>
+        <div class="help-step-body">
+          <div class="help-step-title">กรอก Target และ Actual</div>
+          <div class="help-step-desc">
+            <b>Target</b> — ยอดขายเป้าหมายของเดือนนั้น (บาท)<br>
+            <b>Actual</b> — ยอดขายจริงที่ทำได้ (บาท)<br>
+            ระบบจะคำนวณ <b>%Achievement</b> ทันที<br>
+            <span class="tag tag-green">≥ 80%</span> ผ่านเกณฑ์ได้รับผลตอบแทน &nbsp;
+            <span class="tag tag-red">< 80%</span> ไม่ได้รับ
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="help-step">
+        <div class="help-num" style="background:linear-gradient(135deg,#d29922,#fbbf24)">5</div>
+        <div class="help-step-body">
+          <div class="help-step-title">กรอกจำนวน PC</div>
+          <div class="help-step-desc">
+            ใส่จำนวน PC ทั้งหมดในสาขา <b>(รวม PC วิ่ง + Promo)</b><br>
+            ระบบจะ <b>หาร Commission และ By Gallon ต่อหัว</b> ให้อัตโนมัติ
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="help-step">
+        <div class="help-num" style="background:linear-gradient(135deg,#0891b2,#22d3ee)">6</div>
+        <div class="help-step-body">
+          <div class="help-step-title">กรอกยอด By Gallon</div>
+          <div class="help-step-desc">
+            เลือกรูปแบบ <span class="tag tag-orange">฿ บาท</span> หรือ <span class="tag tag-blue">% สัดส่วน</span><br>
+            กรอกยอดขายแยกตามกลุ่ม:<br>
+            🔶 <b>Ultra Premium</b> — อัตรา 2.00%<br>
+            🔷 <b>Premium</b> — อัตรา 1.50%<br>
+            ⬜ <b>Medium</b> — อัตรา 1.00%<br>
+            ยอดรวม By Gallon <b>ต้องไม่เกิน Actual</b> (มี progress bar บอก)
+          </div>
+        </div>
+      </div>
+
+      <div class="help-divider"></div>
+
+      <!-- Result -->
+      <div class="help-step">
+        <div class="help-num" style="background:linear-gradient(135deg,#be185d,#f472b6)">📊</div>
+        <div class="help-step-body">
+          <div class="help-step-title">ดูผลการคำนวณ</div>
+          <div class="help-step-desc">
+            ผลจะแสดงด้านขวา (หรือด้านล่างบนมือถือ) แบ่งเป็น 3 ส่วน:<br>
+            <span class="tag tag-orange">1 Incentive</span> คำนวณจาก %Achievement × Rate ตาม Size<br>
+            <span class="tag tag-blue">2 Commission</span> คำนวณจากยอดเฉลี่ย/คน ตาม Tier ของห้าง<br>
+            <span class="tag tag-green">3 By Gallon</span> คำนวณจากยอดแต่ละกลุ่ม ÷ จำนวน PC<br><br>
+            <b>💵 ยอดรวมทั้งหมด</b> = Incentive + Commission + By Gallon (ต่อคน/เดือน)
+          </div>
+        </div>
+      </div>
+
+      <div class="help-note">
+        💡 <b>Extra Bonus:</b> PC ที่ Achievement ≥ 100% จะได้รับ Bonus เพิ่ม<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;Size XL: +1,000 / +2,000 / +3,000 บาท ตาม % ที่ทำได้<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;Size S/M/L: +1,000 บาท เมื่อ Achievement ≥ 100%<br><br>
+        🖨️ กดปุ่ม <b>พิมพ์ / Save PDF</b> เพื่อบันทึกผลการคำนวณได้ทันที
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <div class="container">
