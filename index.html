@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC Commission Simulator 2569 – Beger</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --beger-blue: #1a2e6e;
+    --beger-orange: #e85c1a;
+    --accent: #f0862a;
+    --accent2: #2563eb;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --dohome: #e85c1a;
+    --homehub: #2563eb;
+    --homeone: #7c3aed;
+    --homeshop: #059669;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+  .header {
+    background: linear-gradient(135deg, #0f1923 0%, #1a2e6e 50%, #0f1923 100%);
+    border-bottom: 2px solid var(--beger-orange);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-badge {
+    background: var(--beger-orange);
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    letter-spacing: 1px;
+  }
+  .header h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    line-height: 1.3;
+  }
+  .header span {
+    font-size: 12px;
+    color: var(--accent);
+    display: block;
+    font-weight: 400;
+  }
+  .container { padding: 16px; max-width: 900px; margin: 0 auto; }
+
+  .chain-tabs {
+    display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .chain-tab {
+    padding: 8px 16px; border-radius: 8px; border: 2px solid var(--border);
+    background: var(--surface); color: var(--text-muted);
+    cursor: pointer; font-size: 13px; font-weight: 600;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+  }
+  .chain-tab:hover { border-color: var(--accent); color: var(--text); }
+  .chain-tab.active { color: white; border-color: transparent; }
+  .chain-tab[data-chain="dohome"].active { background: var(--dohome); }
+  .chain-tab[data-chain="homehub"].active { background: var(--homehub); }
+  .chain-tab[data-chain="homeone"].active { background: var(--homeone); }
+  .chain-tab[data-chain="homeshop"].active { background: var(--homeshop); }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .card-title {
+    font-size: 13px; font-weight: 700;
+    color: white; margin: -16px -16px 14px -16px;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    border-radius: 10px 10px 0 0;
+  }
+  .card-title.sec1 { background: linear-gradient(90deg, #b84a0e, #e85c1a); border-bottom: 2px solid #f0862a; }
+  .card-title.sec3 { background: linear-gradient(90deg, #1a48b8, #2563eb); border-bottom: 2px solid #60a5fa; }
+  .card-title .num {
+    width: 26px; height: 26px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; background: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+  .card-title .sec-label { font-size: 11px; opacity: 0.75; font-weight: 400; margin-left: auto; }
+
+  .form-group { margin-bottom: 12px; }
+  .form-group label {
+    display: block; font-size: 12px; color: var(--text-muted);
+    margin-bottom: 4px; font-weight: 500;
+  }
+  .form-group input, .form-group select {
+    width: 100%; padding: 8px 12px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus {
+    border-color: var(--accent2);
+  }
+  .form-group select option { background: var(--surface2); }
+
+  .size-group { display: flex; gap: 6px; }
+  .size-btn {
+    flex: 1; padding: 8px 4px; border-radius: 6px;
+    border: 2px solid var(--border); background: var(--surface2);
+    color: var(--text-muted); font-weight: 700; font-size: 13px;
+    cursor: pointer; transition: all 0.2s; font-family: 'IBM Plex Sans Thai', sans-serif;
+  }
+  .size-btn:hover { border-color: var(--accent); color: var(--text); }
+  .size-btn.active { background: var(--beger-blue); border-color: var(--accent2); color: white; }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .result-header {
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .result-header .title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .achieve-badge {
+    padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .achieve-badge.pass { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid var(--green); }
+  .achieve-badge.fail { background: rgba(248,81,73,0.15); color: var(--red); border: 1px solid var(--red); }
+
+  .result-rows { padding: 12px 16px; }
+  .result-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-row .label { font-size: 12px; color: var(--text-muted); }
+  .result-row .sublabel { font-size: 11px; color: var(--text-muted); opacity: 0.6; margin-top: 2px; }
+  .result-row .value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px; font-weight: 600; color: var(--text);
+  }
+  .result-row .value.zero { color: var(--text-muted); }
+  .result-row .value.bonus { color: var(--green); font-size: 12px; }
+  .result-row .value.highlight { color: var(--accent); font-size: 15px; }
+
+  .total-bar {
+    background: linear-gradient(135deg, var(--beger-blue), #0f1923);
+    border: 1px solid var(--accent2);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .total-bar .label { font-size: 13px; color: rgba(255,255,255,0.7); }
+  .total-bar .total-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 24px; font-weight: 700; color: white;
+  }
+  .total-bar .total-unit { font-size: 12px; color: var(--accent); }
+
+  .no-qualify {
+    text-align: center; padding: 24px;
+    color: var(--red); font-weight: 600;
+    background: rgba(248,81,73,0.08);
+    border-radius: 8px; margin: 8px;
+    border: 1px dashed rgba(248,81,73,0.3);
+  }
+
+  .commission-table {
+    margin-top: 8px; font-size: 11px;
+    border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+  }
+  .ct-row {
+    display: flex; padding: 5px 10px;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    gap: 8px;
+  }
+  .ct-row:last-child { border-bottom: none; }
+  .ct-row.active { background: rgba(230,93,26,0.1); }
+  .ct-row .range { flex: 1; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; font-size: 10px; }
+  .ct-row .rate { color: var(--accent); font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+  .ct-row.active .range { color: var(--text); }
+
+  /* Result section headers */
+  .rsec {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 12px; margin: 0 -16px; border-radius: 0;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
+  }
+  .rsec.s1 { background: linear-gradient(90deg,rgba(184,74,14,0.35),rgba(230,93,26,0.15)); border-left: 3px solid #e85c1a; }
+  .rsec.s2 { background: linear-gradient(90deg,rgba(26,72,184,0.35),rgba(37,99,235,0.15)); border-left: 3px solid #2563eb; }
+  .rsec.s3 { background: linear-gradient(90deg,rgba(5,150,105,0.35),rgba(16,185,129,0.15)); border-left: 3px solid #10b981; }
+  .rsec .sec-num {
+    width: 22px; height: 22px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; margin-right: 6px; flex-shrink: 0;
+  }
+  .rsec.s1 .sec-num { background: rgba(230,93,26,0.4); }
+  .rsec.s2 .sec-num { background: rgba(37,99,235,0.4); }
+  .rsec.s3 .sec-num { background: rgba(16,185,129,0.4); }
+  .rsec .sec-title { display: flex; align-items: center; gap: 6px; }
+  .rsec .sec-amount {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px; font-weight: 700;
+  }
+  .rsec.s1 .sec-amount { color: #f0862a; }
+  .rsec.s2 .sec-amount { color: #60a5fa; }
+  .rsec.s3 .sec-amount { color: #34d399; }
+
+  /* Gallon detail table */
+  .gallon-table {
+    background: var(--surface2); border-radius: 6px; overflow: hidden;
+    margin: 6px 0 2px; font-size: 11px; border: 1px solid var(--border);
+  }
+  .gt-header {
+    display: grid; grid-template-columns: 1fr 80px 52px 48px 80px;
+    padding: 5px 10px; background: rgba(255,255,255,0.04);
+    color: var(--text-muted); font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .gt-row {
+    display: grid; grid-template-columns: 1fr 80px 52px 48px 80px;
+    padding: 6px 10px; border-bottom: 1px solid rgba(48,54,61,0.4);
+    align-items: center;
+  }
+  .gt-pct { font-family: 'IBM Plex Mono', monospace; text-align: right; font-size: 10px; color: var(--text-muted); }
+
+  /* Gallon budget bar */
+  .gallon-budget {
+    margin-top: 10px; padding: 10px 12px;
+    background: var(--surface2); border-radius: 8px;
+    border: 1px solid var(--border); transition: border-color 0.2s;
+  }
+  .gallon-budget.ok    { border-color: var(--green); }
+  .gallon-budget.warn  { border-color: var(--yellow); }
+  .gallon-budget.over  { border-color: var(--red); }
+  .gb-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .gb-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+  .gb-remain { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700; }
+  .gb-remain.ok   { color: var(--green); }
+  .gb-remain.warn { color: var(--yellow); }
+  .gb-remain.over { color: var(--red); }
+  .gb-bar-bg {
+    width: 100%; height: 8px; background: rgba(255,255,255,0.08);
+    border-radius: 4px; overflow: hidden;
+  }
+  .gb-bar-fill {
+    height: 100%; border-radius: 4px; transition: width 0.3s, background 0.3s;
+  }
+  .gb-bar-fill.ok   { background: var(--green); }
+  .gb-bar-fill.warn { background: var(--yellow); }
+  .gb-bar-fill.over { background: var(--red); }
+  .gb-detail { display: flex; justify-content: space-between; margin-top: 5px; font-size: 10px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+  .gb-err { margin-top: 6px; font-size: 11px; color: var(--red); font-weight: 600; display: none; }
+  .gallon-budget.over .gb-err { display: block; }
+  .input-over { border-color: var(--red) !important; }
+
+  /* Gallon mode toggle */
+  .gallon-mode-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px; gap: 8px;
+  }
+  .gallon-mode-row .gm-label { font-size: 11px; color: var(--text-muted); }
+  .gm-toggle {
+    display: flex; background: var(--surface2); border-radius: 8px;
+    padding: 3px; gap: 2px; border: 1px solid var(--border);
+  }
+  .gm-btn {
+    padding: 5px 12px; border-radius: 6px; border: none;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    transition: all 0.2s; color: var(--text-muted); background: transparent;
+    white-space: nowrap;
+  }
+  .gm-btn.active-baht { background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+  .gm-btn.active-pct  { background: var(--surface); color: #60a5fa;       box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+  .pct-suffix {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 13px; font-weight: 700; color: #60a5fa;
+    font-family: 'IBM Plex Mono', monospace; pointer-events: none;
+  }
+  .input-wrap { position: relative; }
+  .input-wrap input { padding-right: 30px; }
+
+  /* ── Branch Selector ────────────────────────────── */
+  .branch-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .branch-card-label {
+    font-size: 12px; font-weight: 700; color: var(--text-muted);
+    white-space: nowrap; display: flex; align-items: center; gap: 5px;
+  }
+  .branch-card select {
+    flex: 1; min-width: 200px; padding: 8px 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 13px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    outline: none; cursor: pointer; transition: border-color 0.2s;
+  }
+  .branch-card select:focus { border-color: var(--accent2); }
+  .branch-card select option, .branch-card select optgroup {
+    background: var(--surface2); color: var(--text);
+  }
+  .branch-info-box {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .binfo-sep { color: var(--border); font-size: 16px; }
+  .binfo-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .binfo-item-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
+  .size-badge {
+    padding: 3px 10px; border-radius: 6px; font-size: 13px;
+    font-weight: 800; font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.5px; border: 1.5px solid transparent;
+  }
+  .size-badge.s  { background:rgba(139,148,158,0.15); color:#8b949e; border-color:#8b949e; }
+  .size-badge.m  { background:rgba(210,153,34,0.15);  color:#d29922; border-color:#d29922; }
+  .size-badge.l  { background:rgba(37,99,235,0.15);   color:#60a5fa; border-color:#2563eb; }
+  .size-badge.xl { background:rgba(5,150,105,0.15);   color:#34d399; border-color:#059669; }
+  .binfo-sap { font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted); background:var(--surface2); padding:3px 8px; border-radius:4px; border:1px solid var(--border); }
+  .branch-clear-btn {
+    padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border);
+    background: transparent; color: var(--text-muted); font-size: 11px;
+    cursor: pointer; font-family: 'IBM Plex Sans Thai', sans-serif;
+    white-space: nowrap; transition: all 0.2s;
+  }
+  .branch-clear-btn:hover { border-color: var(--red); color: var(--red); }
+  .print-btn {
+    margin-left: auto;
+    padding: 10px 22px;
+    background: var(--beger-orange);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 10px;
+    color: #ffffff !important;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Sans Thai', sans-serif;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.4px;
+    position: relative;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.35);
+  }
+  .print-btn:hover {
+    background: #d44e10;
+    border-color: rgba(255,255,255,0.5);
+    box-shadow: 0 5px 18px rgba(0,0,0,0.45);
+    transform: translateY(-1px);
+  }
+  .print-btn:active { transform: translateY(0); }
+
+  /* ============ PRINT / PDF A4 ============ */
+  @media print {
+    @page { size: A4 portrait; margin: 12mm 10mm; }
+    body { background: white !important; color: #111 !important; font-size: 11px !important; }
+    .header { background: #1a2e6e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 10px 14px; border-bottom: 3px solid #e85c1a !important; }
+    .logo-badge { background: #e85c1a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 14px; }
+    .header h1 { font-size: 13px; }
+    .header span { font-size: 10px; }
+    .print-btn { display: none !important; }
+    .chain-tabs { display: none !important; }
+    .branch-card { background:#f8f8f8 !important; border-color:#ccc !important; }
+    .branch-card select { display: none !important; }
+    .branch-clear-btn { display: none !important; }
+    .branch-card-label { color: #333 !important; }
+    #branchPrintName { display: inline !important; }
+    .container { padding: 8px; max-width: 100%; }
+    .grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .card { border: 1px solid #ccc !important; background: white !important; padding: 10px; }
+    .card-title.sec1 { background: #e85c1a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: -10px -10px 10px -10px; padding: 7px 10px; }
+    .card-title.sec3 { background: #2563eb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: -10px -10px 10px -10px; padding: 7px 10px; }
+    .card-title .num { background: rgba(255,255,255,0.3) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .form-group input { background: #f5f5f5 !important; color: #111 !important; border: 1px solid #ccc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .size-btn { background: #eee !important; color: #555 !important; border-color: #ccc !important; }
+    .size-btn.active { background: #1a2e6e !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .helper-row { background: #f0f0f0 !important; color: #111 !important; }
+    .result-card { border: 1px solid #ccc !important; background: white !important; }
+    .result-header { background: #f0f0f0 !important; }
+    .result-header .title { color: #111 !important; }
+    .achieve-badge.pass { background: #d4edda !important; color: #155724 !important; border-color: #28a745 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .achieve-badge.fail { background: #f8d7da !important; color: #721c24 !important; border-color: #dc3545 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .result-rows { padding: 8px 10px; }
+    .result-row { border-color: #ddd !important; }
+    .result-row .label { color: #555 !important; }
+    .result-row .sublabel { color: #777 !important; }
+    .result-row .value { color: #111 !important; }
+    .result-row .value.highlight { color: #c04a00 !important; }
+    .result-row .value.bonus { color: #1a7a2e !important; }
+    .rsec { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rsec.s1 { background: rgba(184,74,14,0.15) !important; border-left-color: #e85c1a !important; }
+    .rsec.s2 { background: rgba(26,72,184,0.12) !important; border-left-color: #2563eb !important; }
+    .rsec.s3 { background: rgba(5,150,105,0.12) !important; border-left-color: #059669 !important; }
+    .rsec.s1 .sec-amount { color: #c04a00 !important; }
+    .rsec.s2 .sec-amount { color: #1a40a0 !important; }
+    .rsec.s3 .sec-amount { color: #065f46 !important; }
+    .rsec.s1 .sec-num { background: rgba(184,74,14,0.25) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rsec.s2 .sec-num { background: rgba(37,99,235,0.2) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rsec.s3 .sec-num { background: rgba(5,150,105,0.2) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .commission-table { border-color: #ccc !important; }
+    .ct-row { border-color: #eee !important; }
+    .ct-row .range { color: #555 !important; }
+    .ct-row .rate { color: #c04a00 !important; }
+    .ct-row.active { background: rgba(230,93,26,0.08) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .ct-row.active .range { color: #111 !important; }
+    .gallon-table { border-color: #ccc !important; background: white !important; }
+    .gt-header { background: #f0f0f0 !important; color: #555 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .gt-row { border-color: #eee !important; }
+    .gt-row.gt-sum { background: #f8f8f8 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .gt-row.gt-per { background: rgba(5,150,105,0.06) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .gt-row.gt-cap { background: rgba(220,53,69,0.06) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .c-up { color: #c04a00 !important; } .c-p { color: #1a48b8 !important; } .c-m { color: #4a6e00 !important; }
+    .c-per { color: #065f46 !important; } .c-cap { color: #721c24 !important; }
+    .gt-pct { color: #777 !important; }
+    .total-bar { background: #1a2e6e !important; border-color: #2563eb !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .total-bar .label { color: rgba(255,255,255,0.8) !important; }
+    .total-bar .total-value { color: white !important; }
+    .total-bar .total-unit { color: #f0862a !important; }
+    .no-qualify { background: #f8d7da !important; border-color: #dc3545 !important; color: #721c24 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  .gt-row:last-child { border-bottom: none; }
+  .gt-row.gt-sum { background: rgba(255,255,255,0.03); font-weight: 600; }
+  .gt-row.gt-per { background: rgba(16,185,129,0.08); font-weight: 700; }
+  .gt-row.gt-cap { background: rgba(248,81,73,0.06); font-weight: 700; }
+  .gt-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 5px; vertical-align: middle; }
+  .gt-val { font-family: 'IBM Plex Mono', monospace; text-align: right; }
+  .c-up { color: #fb923c; }
+  .c-p  { color: #60a5fa; }
+  .c-m  { color: #a3e635; }
+  .c-sum { color: var(--text); }
+  .c-per { color: #34d399; font-size: 13px; }
+  .c-cap { color: var(--red); }
+
+  .helper-row {
+    display: flex; gap: 8px; align-items: center;
+    background: var(--surface2); border-radius: 6px;
+    padding: 8px 10px; margin-top: 8px;
+    font-size: 12px;
+  }
+  .helper-row .ach { font-family: 'IBM Plex Mono', monospace; font-weight: 700; }
+  .helper-row .ach.pass { color: var(--green); }
+  .helper-row .ach.fail { color: var(--red); }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo-badge">BG</div>
+  <div>
+    <h1>PC Commission Simulator 2569</h1>
+    <span>จำลองการคำนวณค่าตอบแทน PC Modern Trade · มีผลบังคับใช้ 1 มิ.ย. 2569</span>
+  </div>
+  <button class="print-btn" onclick="window.print()">
+    🖨️ <span style="color:#ffffff !important">พิมพ์ / Save PDF</span>
+  </button>
+</div>
+
+<div class="container">
+  <div class="chain-tabs">
+    <button class="chain-tab active" data-chain="dohome" onclick="selectChain('dohome',this)">🏠 DoHome</button>
+    <button class="chain-tab" data-chain="homehub" onclick="selectChain('homehub',this)">🏪 HomeHub</button>
+    <button class="chain-tab" data-chain="homeone" onclick="selectChain('homeone',this)">🔨 HomeOne</button>
+    <button class="chain-tab" data-chain="homeshop" onclick="selectChain('homeshop',this)">🛒 HomeShop</button>
+  </div>
+
+  <!-- Branch Selector Card -->
+  <div class="branch-card">
+    <span class="branch-card-label">🏪 เลือกสาขา</span>
+    <select id="branchSelect" onchange="onBranchSelect(this)">
+      <option value="">— เลือกสาขา —</option>
+    </select>
+    <span id="branchPrintName" style="display:none;font-weight:700;font-size:13px;color:#333"></span>
+    <div class="branch-info-box" id="branchInfoBox" style="display:none">
+      <span class="binfo-sep">|</span>
+      <div class="binfo-item">
+        <span class="binfo-item-label">BG Size</span>
+        <span class="size-badge" id="bgSizeBadge">—</span>
+      </div>
+      <div class="binfo-item">
+        <span class="binfo-item-label">Market Size</span>
+        <span class="size-badge" id="marketSizeBadge">—</span>
+      </div>
+      <span class="binfo-sap" id="sapCodeText"></span>
+      <button class="branch-clear-btn" onclick="clearBranch()">✕ ล้าง</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <div class="card-title sec1">
+          <span class="num">1</span>
+          ข้อมูลสาขา & Incentive
+          <span class="sec-label">กรอกข้อมูลสาขา</span>
+        </div>
+        <div class="form-group">
+          <label>Store Size (Beger)</label>
+          <div class="size-group">
+            <button class="size-btn active" data-size="S"  onclick="selectSize('S',this)">S</button>
+            <button class="size-btn"        data-size="M"  onclick="selectSize('M',this)">M</button>
+            <button class="size-btn"        data-size="L"  onclick="selectSize('L',this)">L</button>
+            <button class="size-btn"        data-size="XL" onclick="selectSize('XL',this)">XL</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Target ยอดขาย (บาท)</label>
+          <input type="text" id="target" placeholder="เช่น 600,000" oninput="formatInput(this);autoCalc()">
+        </div>
+        <div class="form-group">
+          <label>Actual ยอดขายจริง (บาท)</label>
+          <input type="text" id="actual" placeholder="เช่น 660,000" oninput="formatInput(this);validateGallon();autoCalc()">
+        </div>
+        <div class="form-group">
+          <label>จำนวน PC ทั้งหมดในสาขา</label>
+          <input type="number" id="pcCount" placeholder="รวม PC วิ่ง + Promo" min="1" value="1" style="font-family:'IBM Plex Mono',monospace" oninput="autoCalc()">
+        </div>
+        <div id="helperRow" class="helper-row" style="display:none">
+          <span>%Achievement:</span>
+          <span id="achDisplay" class="ach">-</span>
+          <span id="achStatus" style="font-size:11px"></span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="card-title sec3">
+          <span class="num">3</span>
+          By Gallon – ยอดขายแต่ละกลุ่ม
+          <span class="sec-label">Ultra Premium / Premium / Medium</span>
+        </div>
+
+        <!-- Mode toggle -->
+        <div class="gallon-mode-row">
+          <span class="gm-label">รูปแบบการกรอก</span>
+          <div class="gm-toggle">
+            <button id="gmBtnBaht" class="gm-btn active-baht" onclick="setGallonMode('baht')">฿ บาท</button>
+            <button id="gmBtnPct"  class="gm-btn"             onclick="setGallonMode('pct')">% สัดส่วน</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label id="labelUP">🔶 Ultra Premium (2.00%)</label>
+          <div class="input-wrap">
+            <input type="text" id="galUP" placeholder="ยอดขายกลุ่ม Ultra Premium" oninput="formatInput(this);validateGallon();autoCalc()">
+            <span class="pct-suffix" id="sufUP" style="display:none">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label id="labelP">🔷 Premium (1.50%)</label>
+          <div class="input-wrap">
+            <input type="text" id="galP" placeholder="ยอดขายกลุ่ม Premium" oninput="formatInput(this);validateGallon();autoCalc()">
+            <span class="pct-suffix" id="sufP" style="display:none">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label id="labelM">⬜ Medium (1.00%)</label>
+          <div class="input-wrap">
+            <input type="text" id="galM" placeholder="ยอดขายกลุ่ม Medium" oninput="formatInput(this);validateGallon();autoCalc()">
+            <span class="pct-suffix" id="sufM" style="display:none">%</span>
+          </div>
+        </div>
+
+        <!-- Budget bar -->
+        <div id="gallonBudget" class="gallon-budget" style="display:none">
+          <div class="gb-top">
+            <span class="gb-label">🧮 ยอดรวม By Gallon vs. Actual</span>
+            <span id="gbRemain" class="gb-remain ok">เหลือ 0 บาท</span>
+          </div>
+          <div class="gb-bar-bg">
+            <div id="gbFill" class="gb-bar-fill ok" style="width:0%"></div>
+          </div>
+          <div class="gb-detail">
+            <span id="gbUsed">รวม: 0</span>
+            <span id="gbPct">0.0% ของ Actual</span>
+            <span id="gbMax">Actual: 0</span>
+          </div>
+          <div id="gbErr" class="gb-err">⛔ ยอดรวมเกิน Actual – กรุณาปรับตัวเลขให้รวมกันไม่เกิน 100%</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultsPanel">
+      <div style="color:var(--text-muted);text-align:center;padding:60px 20px;font-size:13px">
+        กรอกข้อมูลเพื่อดูผลการคำนวณ
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentChain = 'dohome';
+let currentSize  = 'S';
+let gallonMode   = 'baht'; // 'baht' | 'pct'
+
+/* ── Gallon mode toggle ────────────────────────────── */
+function setGallonMode(mode){
+  if(gallonMode === mode) return;
+  gallonMode = mode;
+
+  // clear gallon inputs when switching
+  ['galUP','galP','galM'].forEach(id => {
+    document.getElementById(id).value = '';
+    document.getElementById(id).classList.remove('input-over');
+  });
+
+  // update button styles
+  document.getElementById('gmBtnBaht').className = 'gm-btn' + (mode==='baht' ? ' active-baht' : '');
+  document.getElementById('gmBtnPct').className  = 'gm-btn' + (mode==='pct'  ? ' active-pct'  : '');
+
+  // show/hide % suffix
+  ['UP','P','M'].forEach(k => {
+    document.getElementById('suf'+k).style.display = mode==='pct' ? 'block' : 'none';
+  });
+
+  // update placeholders & labels
+  if(mode === 'pct'){
+    document.getElementById('galUP').placeholder = 'สัดส่วน Ultra Premium (%)';
+    document.getElementById('galP').placeholder  = 'สัดส่วน Premium (%)';
+    document.getElementById('galM').placeholder  = 'สัดส่วน Medium (%)';
+    document.getElementById('labelUP').innerHTML = '🔶 Ultra Premium <span style="color:#fb923c;font-family:\'IBM Plex Mono\',monospace">× 2.00%</span> — กรอกเป็น % ของ Actual';
+    document.getElementById('labelP').innerHTML  = '🔷 Premium <span style="color:#60a5fa;font-family:\'IBM Plex Mono\',monospace">× 1.50%</span> — กรอกเป็น % ของ Actual';
+    document.getElementById('labelM').innerHTML  = '⬜ Medium <span style="color:#a3e635;font-family:\'IBM Plex Mono\',monospace">× 1.00%</span> — กรอกเป็น % ของ Actual';
+  } else {
+    document.getElementById('galUP').placeholder = 'ยอดขายกลุ่ม Ultra Premium';
+    document.getElementById('galP').placeholder  = 'ยอดขายกลุ่ม Premium';
+    document.getElementById('galM').placeholder  = 'ยอดขายกลุ่ม Medium';
+    document.getElementById('labelUP').innerHTML = '🔶 Ultra Premium (2.00%)';
+    document.getElementById('labelP').innerHTML  = '🔷 Premium (1.50%)';
+    document.getElementById('labelM').innerHTML  = '⬜ Medium (1.00%)';
+  }
+
+  // disable formatInput comma for pct mode (raw decimal number)
+  validateGallon();
+  autoCalc();
+}
+
+/* helper: get gallon baht value from input */
+function getGallonBaht(id){
+  const raw = document.getElementById(id).value.replace(/,/g,'');
+  const v   = parseFloat(raw) || 0;
+  if(gallonMode === 'pct'){
+    const actual = parseVal('actual');
+    return actual * v / 100;
+  }
+  return v;
+}
+
+/* helper: raw numeric value of gallon field */
+function getGallonRaw(id){
+  const raw = document.getElementById(id).value.replace(/,/g,'');
+  return parseFloat(raw) || 0;
+}
+
+const CHAINS = {
+  dohome: {
+    name: 'DoHome',
+    commission: [
+      { min:200000, max:299999, rate:0.02 },
+      { min:300000, max:399999, rate:0.0225 },
+      { min:400000, max:499999, rate:0.0275 },
+      { min:500000, max:549999, rate:0.03 },
+      { min:550000, max:Infinity, lump:19250 }
+    ]
+  },
+  homehub: {
+    name: 'HomeHub',
+    commission: [
+      { min:250000, max:299999, rate:0.0175 },
+      { min:300000, max:349999, rate:0.02 },
+      { min:350000, max:399999, rate:0.0225 },
+      { min:400000, max:449999, rate:0.025 },
+      { min:450000, max:Infinity, lump:12375 }
+    ]
+  },
+  homeone: {
+    name: 'HomeOne',
+    commission: [
+      { min:150000, max:249999, rate:0.02 },
+      { min:250000, max:349999, rate:0.0225 },
+      { min:350000, max:449999, rate:0.0275 },
+      { min:450000, max:Infinity, lump:13500 }
+    ]
+  },
+  homeshop: {
+    name: 'HomeShop',
+    commission: [
+      { min:100000, max:199999, rate:0.015 },
+      { min:200000, max:249999, rate:0.0175 },
+      { min:250000, max:299999, rate:0.02 },
+      { min:300000, max:349999, rate:0.0225 },
+      { min:350000, max:Infinity, lump:12250 }
+    ]
+  }
+};
+
+const STEPS = {
+  'SM': [
+    {min:80,max:89.99,rate:30},{min:90,max:99.99,rate:35},
+    {min:100,max:109.99,rate:40},{min:110,max:119.99,rate:45},
+    {min:120,max:129.99,rate:50},{min:130,max:139.99,rate:55},
+    {min:140,max:149.99,rate:60},{min:150,max:Infinity,lump:9000}
+  ],
+  'L': [
+    {min:80,max:89.99,rate:35},{min:90,max:99.99,rate:40},
+    {min:100,max:109.99,rate:45},{min:110,max:119.99,rate:50},
+    {min:120,max:129.99,rate:55},{min:130,max:139.99,rate:60},
+    {min:140,max:149.99,rate:65},{min:150,max:Infinity,lump:10000}
+  ],
+  'XL': [
+    {min:80,max:89.99,rate:40},{min:90,max:99.99,rate:45},
+    {min:100,max:109.99,rate:50},{min:110,max:119.99,rate:55},
+    {min:120,max:129.99,rate:60},{min:130,max:139.99,rate:65},
+    {min:140,max:149.99,rate:70},{min:150,max:Infinity,lump:11000}
+  ]
+};
+
+function formatInput(el){
+  // ถ้าเป็น % mode และเป็น gallon field → ไม่ใส่ comma, จำกัด 0-100
+  const gallonIds = ['galUP','galP','galM'];
+  if(gallonMode === 'pct' && gallonIds.includes(el.id)){
+    const raw = el.value.replace(/[^\d.]/g,'');
+    // จำกัดทศนิยม 1 ตำแหน่ง
+    const num = parseFloat(raw);
+    if(!isNaN(num)){
+      // ไม่ cap ที่ 100 ตอน type แต่จะแสดง error ใน validateGallon
+      el.value = raw;
+    } else {
+      el.value = '';
+    }
+    return;
+  }
+  // เก็บตำแหน่ง cursor
+  const pos = el.selectionStart;
+  const oldLen = el.value.length;
+  // ลบทุกอย่างที่ไม่ใช่ตัวเลข
+  const raw = el.value.replace(/[^\d]/g,'');
+  if(raw===''){el.value='';return;}
+  // จัดรูปแบบด้วย comma
+  const formatted = Number(raw).toLocaleString('en-US');
+  el.value = formatted;
+  // คืนตำแหน่ง cursor (ปรับตาม comma ที่เพิ่มเข้ามา)
+  const newLen = el.value.length;
+  el.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+}
+
+function parseVal(id){
+  const v = document.getElementById(id).value.replace(/,/g,'');
+  return parseFloat(v)||0;
+}
+
+function validateGallon(){
+  const actual  = parseVal('actual');
+  const rawUP   = getGallonRaw('galUP');
+  const rawP    = getGallonRaw('galP');
+  const rawM    = getGallonRaw('galM');
+  const budget  = document.getElementById('gallonBudget');
+
+  if(!actual){ budget.style.display='none'; return; }
+  budget.style.display='block';
+
+  if(gallonMode === 'pct'){
+    /* ── % mode ── */
+    const totalPct = rawUP + rawP + rawM;
+    const isOver   = totalPct > 100;
+    const isWarn   = !isOver && totalPct >= 80;
+    const state    = isOver ? 'over' : isWarn ? 'warn' : 'ok';
+    const remainPct = 100 - totalPct;
+
+    // compute baht values for display
+    const bathUP = actual * rawUP / 100;
+    const bathP  = actual * rawP  / 100;
+    const bathM  = actual * rawM  / 100;
+    const bathTotal = bathUP + bathP + bathM;
+
+    budget.className = 'gallon-budget ' + state;
+    document.getElementById('gbFill').className = 'gb-bar-fill ' + state;
+    document.getElementById('gbFill').style.width = Math.min(totalPct, 100) + '%';
+    document.getElementById('gbRemain').className = 'gb-remain ' + state;
+    document.getElementById('gbRemain').textContent = isOver
+      ? '⛔ เกิน ' + (Math.abs(remainPct)).toFixed(1) + '%'
+      : 'เหลือ ' + remainPct.toFixed(1) + '%';
+    document.getElementById('gbUsed').textContent = 'รวม: ' + totalPct.toFixed(1) + '%';
+    document.getElementById('gbPct').textContent  = '≈ ' + fmt(bathTotal) + ' บาท';
+    document.getElementById('gbMax').textContent  = 'Actual: ' + fmt(actual);
+    document.getElementById('gbErr').textContent  = '⛔ % รวมเกิน 100% – กรุณาปรับสัดส่วนให้รวมกันไม่เกิน 100%';
+
+    ['galUP','galP','galM'].forEach(id => {
+      if(isOver) document.getElementById(id).classList.add('input-over');
+      else document.getElementById(id).classList.remove('input-over');
+    });
+
+  } else {
+    /* ── baht mode (เดิม) ── */
+    const total  = rawUP + rawP + rawM;
+    const pct    = Math.min((total/actual)*100, 999);
+    const remain = actual - total;
+    const isOver = total > actual;
+    const isWarn = !isOver && pct >= 80;
+    const state  = isOver ? 'over' : isWarn ? 'warn' : 'ok';
+
+    budget.className = 'gallon-budget ' + state;
+    document.getElementById('gbFill').className = 'gb-bar-fill ' + state;
+    document.getElementById('gbFill').style.width = Math.min(pct,100) + '%';
+    document.getElementById('gbRemain').className = 'gb-remain ' + state;
+    document.getElementById('gbRemain').textContent = isOver
+      ? '⛔ เกิน ' + fmt(Math.abs(remain)) + ' บาท'
+      : 'เหลือ ' + fmt(remain) + ' บาท';
+    document.getElementById('gbUsed').textContent = 'รวม: ' + fmt(total);
+    document.getElementById('gbPct').textContent  = pct.toFixed(1) + '% ของ Actual';
+    document.getElementById('gbMax').textContent  = 'Actual: ' + fmt(actual);
+    document.getElementById('gbErr').textContent  = '⛔ ยอดรวมเกิน Actual – กรุณาปรับตัวเลขให้รวมกันไม่เกิน 100%';
+
+    ['galUP','galP','galM'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(isOver) el.classList.add('input-over');
+      else el.classList.remove('input-over');
+    });
+  }
+}
+
+function selectChain(chain,btn){
+  currentChain=chain;
+  document.querySelectorAll('.chain-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  buildBranchDropdown(chain);
+  clearBranch();
+  autoCalc();
+}
+function selectSize(size,btn){
+  currentSize=size;
+  document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  autoCalc();
+}
+
+/* ── Branch data ────────────────────────────────── */
+const BRANCHES = {
+  dohome: [
+    {name:'เทพารักษ์',         sap:'1112236', bgSize:'S',  marketSize:'S'},
+    {name:'นครสวรรค์',         sap:'1112232', bgSize:'M',  marketSize:'S'},
+    {name:'กาญจนบุรี',         sap:'1103723', bgSize:'M',  marketSize:'L'},
+    {name:'อยุธยา',            sap:'1103709', bgSize:'M',  marketSize:'L'},
+    {name:'เฮงเจริญ โก อัพ',  sap:'1110637', bgSize:'M',  marketSize:'S'},
+    {name:'บางพูน',            sap:'1110151', bgSize:'M',  marketSize:'L'},
+    {name:'บางนา',             sap:'1103719', bgSize:'M',  marketSize:'L'},
+    {name:'บ่อวิน',            sap:'1103725', bgSize:'M',  marketSize:'L'},
+    {name:'ภูเก็ต',            sap:'1113451', bgSize:'M',  marketSize:'XL'},
+    {name:'เชียงราย',          sap:'1103711', bgSize:'L',  marketSize:'L'},
+    {name:'บุรีรัมย์',         sap:'1103707', bgSize:'L',  marketSize:'L'},
+    {name:'อุดรธานี',          sap:'1103732', bgSize:'L',  marketSize:'XL'},
+    {name:'พระราม 2',          sap:'1103710', bgSize:'L',  marketSize:'L'},
+    {name:'หาดใหญ่',           sap:'1103733', bgSize:'L',  marketSize:'XL'},
+    {name:'เชียงใหม่',         sap:'1103735', bgSize:'XL', marketSize:'XL'},
+    {name:'พิษณุโลก',          sap:'1103720', bgSize:'XL', marketSize:'XL'},
+    {name:'โคราช',             sap:'1103731', bgSize:'XL', marketSize:'XL'},
+    {name:'สุรินทร์',          sap:'1103713', bgSize:'XL', marketSize:'XL'},
+    {name:'ขอนแก่น',           sap:'1103729', bgSize:'XL', marketSize:'XL'},
+    {name:'ชัยภูมิ',           sap:'1103714', bgSize:'XL', marketSize:'L'},
+    {name:'อุบลราชธานี',       sap:'1112976', bgSize:'XL', marketSize:'XL'},
+    {name:'เพชรเกษม',          sap:'1103734', bgSize:'XL', marketSize:'L'},
+    {name:'รังสิต',            sap:'1103726', bgSize:'XL', marketSize:'XL'},
+    {name:'บางบัวทอง',         sap:'1103727', bgSize:'XL', marketSize:'L'},
+    {name:'ชลบุรี(อมตะนคร)',   sap:'1103730', bgSize:'XL', marketSize:'L'},
+    {name:'แหลมฉบัง (บางละมุง)',sap:'1103718', bgSize:'XL', marketSize:'XL'},
+    {name:'มาบตาพุด',          sap:'1103724', bgSize:'XL', marketSize:'L'},
+    {name:'สุราษฎร์ธานี',      sap:'1103716', bgSize:'XL', marketSize:'XL'},
+  ],
+  homehub: [
+    {name:'อำนาจเจริญ',   sap:'1105871', bgSize:'M',  marketSize:'M'},
+    {name:'ขอนแก่น',      sap:'1105873', bgSize:'L',  marketSize:'M'},
+    {name:'อุบล (วาริน)', sap:'1105875', bgSize:'L',  marketSize:'M'},
+    {name:'อุบล (ทัพไท)', sap:'1105874', bgSize:'XL', marketSize:'L'},
+  ],
+  homeone: [
+    {name:'อำนาจเจริญ',                  sap:'1111140', bgSize:'M',  marketSize:'S'},
+    {name:'มุกดาหาร',                    sap:'1106202', bgSize:'L',  marketSize:'M'},
+    {name:'โฮมเซ็นเตอร์ (อุบลราชธานี)', sap:'1110334', bgSize:'XL', marketSize:'XL'},
+    {name:'ศรีสะเกษ',                    sap:'1105825', bgSize:'XL', marketSize:'L'},
+  ],
+  homeshop: [
+    {name:'พังโคน',           sap:'1106119', bgSize:'S', marketSize:'S'},
+    {name:'นางรอง',           sap:'1106114', bgSize:'M', marketSize:'S'},
+    {name:'ร้อยเอ็ด',         sap:'1106115', bgSize:'M', marketSize:'M'},
+    {name:'พยัคฆภูมิพิสัย',   sap:'1106122', bgSize:'M', marketSize:'M'},
+    {name:'บัวขาว (กุฉินารายณ์)', sap:'1106118', bgSize:'M', marketSize:'M'},
+    {name:'สุวรรณภูมิ',        sap:'1106123', bgSize:'M', marketSize:'M'},
+  ]
+};
+
+const CHAIN_PREFIX = { dohome:'DH', homehub:'HH', homeone:'SR', homeshop:'HS' };
+
+function buildBranchDropdown(chain){
+  const sel = document.getElementById('branchSelect');
+  const branches = BRANCHES[chain] || [];
+  const prefix = CHAIN_PREFIX[chain] || '';
+  sel.innerHTML = '<option value="">— เลือกสาขา —</option>';
+  if(branches.length === 0){
+    sel.innerHTML += '<option disabled>ยังไม่มีข้อมูลสาขา</option>';
+    return;
+  }
+  // group by bgSize
+  const groups = {};
+  branches.forEach(b => {
+    if(!groups[b.bgSize]) groups[b.bgSize] = [];
+    groups[b.bgSize].push(b);
+  });
+  ['S','M','L','XL'].forEach(sz => {
+    if(!groups[sz]) return;
+    groups[sz].forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = `${b.bgSize}|${b.marketSize}|${b.sap}|${b.name}`;
+      opt.textContent = `${prefix} ${b.name}`;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+const SIZE_CLASS = {S:'s', M:'m', L:'l', XL:'xl'};
+
+function onBranchSelect(sel){
+  const val = sel.value;
+  if(!val){ clearBranch(false); return; }
+  const [bgSize, marketSize, sap, branchName] = val.split('|');
+  const prefix = CHAIN_PREFIX[currentChain] || '';
+
+  // auto-set BG size button
+  const sizeBtn = document.querySelector(`.size-btn[data-size="${bgSize}"]`);
+  if(sizeBtn) selectSize(bgSize, sizeBtn);
+
+  // show info box
+  const box = document.getElementById('branchInfoBox');
+  box.style.display = 'flex';
+
+  const bgBadge = document.getElementById('bgSizeBadge');
+  bgBadge.textContent = bgSize;
+  bgBadge.className = 'size-badge ' + (SIZE_CLASS[bgSize]||'');
+
+  const mkBadge = document.getElementById('marketSizeBadge');
+  mkBadge.textContent = marketSize;
+  mkBadge.className = 'size-badge ' + (SIZE_CLASS[marketSize]||'');
+
+  document.getElementById('sapCodeText').textContent = sap;
+
+  // set print-visible name
+  const pn = document.getElementById('branchPrintName');
+  pn.textContent = `${prefix} ${branchName}`;
+}
+
+function clearBranch(resetDropdown=true){
+  if(resetDropdown) document.getElementById('branchSelect').value = '';
+  document.getElementById('branchInfoBox').style.display = 'none';
+  document.getElementById('branchPrintName').textContent = '';
+}
+
+// init dropdown on load
+function fmt(n){ return n.toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:2}); }
+buildBranchDropdown('dohome');
+
+function calcIncentive(achieve,size){
+  const sizeKey=(size==='S'||size==='M')?'SM':size;
+  const steps=STEPS[sizeKey];
+  if(achieve<80) return {base:0,bonus:0,total:0,lump:false,stepInfo:null};
+  let base=0,lump=false,stepInfo=null;
+  for(const s of steps){
+    if(achieve>=s.min&&achieve<=s.max){
+      if(s.lump){base=s.lump;lump=true;stepInfo=s;}
+      else{base=Math.round(achieve*s.rate);stepInfo=s;}
+      break;
+    }
+  }
+  let bonus=0;
+  if(achieve>=100){
+    if(size==='XL'){
+      if(achieve>=150)bonus=3000;
+      else if(achieve>=120)bonus=2000;
+      else bonus=1000;
+    } else { bonus=1000; }
+  }
+  return {base,bonus,total:base+bonus,lump,stepInfo};
+}
+
+function calcCommission(avgSales,chain){
+  const tiers=CHAINS[chain].commission;
+  for(const t of tiers){
+    if(avgSales>=t.min&&avgSales<=t.max){
+      if(t.lump) return {amount:t.lump,lump:true,rate:null,tier:t};
+      return {amount:avgSales*t.rate,lump:false,rate:t.rate,tier:t};
+    }
+  }
+  return {amount:0,lump:false,rate:null,tier:null};
+}
+
+function calcByGallon(up,p,m,pc){
+  const total=(up*0.02)+(p*0.015)+(m*0.01);
+  const perPc=pc>0?total/pc:0;
+  return {total,perPc:Math.min(perPc,8000),capped:perPc>8000};
+}
+
+function autoCalc(){
+  const target=parseVal('target');
+  const actual=parseVal('actual');
+  const pcCount=Math.max(1, parseInt(document.getElementById('pcCount').value)||1);
+  const galUP=getGallonBaht('galUP');
+  const galP=getGallonBaht('galP');
+  const galM=getGallonBaht('galM');
+
+  if(!target||!actual){
+    document.getElementById('resultsPanel').innerHTML=`<div style="color:var(--text-muted);text-align:center;padding:60px 20px;font-size:13px">กรอก Target และ Actual เพื่อดูผลการคำนวณ</div>`;
+    document.getElementById('helperRow').style.display='none';
+    return;
+  }
+
+  // ตรวจสอบ By Gallon เกิน Actual
+  if((galUP+galP+galM) > actual){
+    // ยังอัปเดต helperRow ด้วยข้อมูล achieve ที่ถูกต้อง
+    const _achieve=(actual/target)*100;
+    const _qualified=_achieve>=80;
+    document.getElementById('helperRow').style.display='flex';
+    document.getElementById('achDisplay').textContent=_achieve.toFixed(2)+'%';
+    document.getElementById('achDisplay').className='ach '+(_qualified?'pass':'fail');
+    document.getElementById('achStatus').textContent=_qualified?'✓ ผ่านเกณฑ์':'✗ ไม่ถึง 80%';
+    document.getElementById('achStatus').style.color=_qualified?'var(--green)':'var(--red)';
+    const over = fmt((galUP+galP+galM) - actual);
+    const modeNote = gallonMode==='pct' ? ' (คิดจากสัดส่วน % × Actual)' : '';
+    document.getElementById('resultsPanel').innerHTML=`
+      <div style="background:rgba(248,81,73,0.08);border:1px dashed var(--red);border-radius:10px;padding:24px;text-align:center;color:var(--red)">
+        <div style="font-size:20px;margin-bottom:8px">⛔</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">ยอด By Gallon รวมเกิน Actual</div>
+        <div style="font-size:12px;color:var(--text-muted)">เกินไป <b style="color:var(--red)">${over} บาท${modeNote}</b> — กรุณาปรับยอดขายแต่ละกลุ่มให้รวมกันไม่เกิน Actual</div>
+      </div>`;
+    return;
+  }
+
+  const achieve=(actual/target)*100;
+  const avgSales=actual/pcCount;
+  const qualified=achieve>=80;
+  const chain=CHAINS[currentChain];
+
+  document.getElementById('helperRow').style.display='flex';
+  document.getElementById('achDisplay').textContent=achieve.toFixed(2)+'%';
+  document.getElementById('achDisplay').className='ach '+(qualified?'pass':'fail');
+  document.getElementById('achStatus').textContent=qualified?'✓ ผ่านเกณฑ์':'✗ ไม่ถึง 80%';
+  document.getElementById('achStatus').style.color=qualified?'var(--green)':'var(--red)';
+
+  const incResult=calcIncentive(achieve,currentSize);
+  const comResult=qualified?calcCommission(avgSales,currentChain):{amount:0,lump:false,tier:null};
+  const galResult=qualified?calcByGallon(galUP,galP,galM,pcCount):{total:0,perPc:0,capped:false};
+  const totalIncome=incResult.total+(qualified?comResult.amount:0)+(qualified?galResult.perPc:0);
+
+  let commTableHtml='<div class="commission-table">';
+  for(const t of chain.commission){
+    const isActive=qualified&&comResult.tier===t;
+    const rangeStr=t.lump?`≥ ${fmt(t.min)}`:`${fmt(t.min)}–${fmt(t.max)}`;
+    const rateStr=t.lump?`${fmt(t.lump)} ฿`:`${(t.rate*100).toFixed(2)}%`;
+    commTableHtml+=`<div class="ct-row ${isActive?'active':''}"><span class="range">${rangeStr}</span><span class="rate">${rateStr}</span></div>`;
+  }
+  commTableHtml+='</div>';
+
+  document.getElementById('resultsPanel').innerHTML=`
+    <div class="result-card">
+      <div class="result-header">
+        <span class="title">📊 ผลการคำนวณ – ${chain.name}</span>
+        <span class="achieve-badge ${qualified?'pass':'fail'}">${achieve.toFixed(2)}% ${qualified?'✓':'✗'}</span>
+      </div>
+      ${!qualified?`
+        <div class="no-qualify">❌ %Achievement (${achieve.toFixed(2)}%) ต่ำกว่า 80%<br>
+        <small style="font-weight:400;margin-top:4px;display:block">PC ไม่ได้รับผลตอบแทนใดๆ ในเดือนนี้</small></div>
+      `:`
+        <div class="result-rows">
+          <!-- Section 1: Incentive -->
+          <div class="rsec s1" style="margin-top:-12px;margin-bottom:8px">
+            <span class="sec-title"><span class="sec-num">1</span>🎯 Incentive (Size ${currentSize})</span>
+            <span class="sec-amount">${fmt(incResult.total)} ฿</span>
+          </div>
+          <div class="result-row" style="padding-top:0">
+            <div>
+              <div class="label">ผลตอบแทนหลัก</div>
+              <div class="sublabel">${incResult.lump?`เหมาจ่าย ${achieve.toFixed(2)}% ≥ 150%`:`${achieve.toFixed(2)} × ${incResult.stepInfo?.rate||0} บาท/Step`}</div>
+            </div>
+            <div class="value highlight">${fmt(incResult.base)} ฿</div>
+          </div>
+          ${incResult.bonus>0?`
+          <div class="result-row">
+            <div><div class="label" style="color:var(--green)">Extra Bonus 🎁</div><div class="sublabel">${currentSize==='XL'?(achieve>=150?'≥ 150% → +3,000':achieve>=120?'120–149% → +2,000':'100–119% → +1,000'):'Achievement ≥ 100% → +1,000'}</div></div>
+            <div class="value bonus">+${fmt(incResult.bonus)} ฿</div>
+          </div>`:''}
+
+          <!-- Section 2: Commission -->
+          <div class="rsec s2" style="margin:10px -16px 8px">
+            <span class="sec-title"><span class="sec-num">2</span>💰 Commission (${chain.name})</span>
+            <span class="sec-amount">${fmt(comResult.amount)} ฿</span>
+          </div>
+          <div class="result-row" style="padding-top:0">
+            <div>
+              <div class="label">ยอดขายเฉลี่ย/คน (÷ ${pcCount} คน)</div>
+              <div class="sublabel">${fmt(actual)} ÷ ${pcCount} = ${fmt(avgSales)} บาท${comResult.tier?(comResult.lump?' → เหมาจ่าย':` × ${(comResult.tier.rate*100).toFixed(2)}%`):'  → ต่ำกว่า Step ขั้นต่ำ'}</div>
+            </div>
+            <div class="value ${comResult.amount===0?'zero':'highlight'}">${fmt(comResult.amount)} ฿</div>
+          </div>
+          ${commTableHtml}
+
+          <!-- Section 3: By Gallon -->
+          <div class="rsec s3" style="margin:10px -16px 8px">
+            <span class="sec-title"><span class="sec-num">3</span>🪣 By Gallon</span>
+            <span class="sec-amount">${fmt(galResult.perPc)} ฿</span>
+          </div>
+          <div class="gallon-table">
+            <div class="gt-header">
+              <span>กลุ่มสินค้า</span><span style="text-align:right">ยอดขาย</span><span style="text-align:right">%ยอดขาย</span><span style="text-align:right">อัตรา</span><span style="text-align:right">ผลตอบแทน</span>
+            </div>
+            <div class="gt-row">
+              <span><span class="gt-dot" style="background:#fb923c"></span><span class="c-up">Ultra Premium</span>${gallonMode==='pct'?`<span style="font-size:9px;color:#fb923c;font-family:'IBM Plex Mono',monospace;margin-left:4px">(${getGallonRaw('galUP').toFixed(1)}%)</span>`:''}</span>
+              <span class="gt-val">${fmt(galUP)}</span>
+              <span class="gt-pct">${actual>0?(galUP/actual*100).toFixed(1):'0.0'}%</span>
+              <span class="gt-val c-up">2.00%</span>
+              <span class="gt-val c-up">${fmt(galUP*0.02)}</span>
+            </div>
+            <div class="gt-row">
+              <span><span class="gt-dot" style="background:#60a5fa"></span><span class="c-p">Premium</span>${gallonMode==='pct'?`<span style="font-size:9px;color:#60a5fa;font-family:'IBM Plex Mono',monospace;margin-left:4px">(${getGallonRaw('galP').toFixed(1)}%)</span>`:''}</span>
+              <span class="gt-val">${fmt(galP)}</span>
+              <span class="gt-pct">${actual>0?(galP/actual*100).toFixed(1):'0.0'}%</span>
+              <span class="gt-val c-p">1.50%</span>
+              <span class="gt-val c-p">${fmt(galP*0.015)}</span>
+            </div>
+            <div class="gt-row">
+              <span><span class="gt-dot" style="background:#a3e635"></span><span class="c-m">Medium</span>${gallonMode==='pct'?`<span style="font-size:9px;color:#a3e635;font-family:'IBM Plex Mono',monospace;margin-left:4px">(${getGallonRaw('galM').toFixed(1)}%)</span>`:''}</span>
+              <span class="gt-val">${fmt(galM)}</span>
+              <span class="gt-pct">${actual>0?(galM/actual*100).toFixed(1):'0.0'}%</span>
+              <span class="gt-val c-m">1.00%</span>
+              <span class="gt-val c-m">${fmt(galM*0.01)}</span>
+            </div>
+            <div class="gt-row gt-sum">
+              <span style="color:var(--text-muted);font-size:10px">รวมทั้งสาขา</span>
+              <span class="gt-val">${fmt(galUP+galP+galM)}</span>
+              <span class="gt-pct" style="color:${(galUP+galP+galM)>actual?'var(--red)':'var(--text-muted)'}">
+                ${actual>0?((galUP+galP+galM)/actual*100).toFixed(1):'0.0'}%
+              </span>
+              <span></span>
+              <span class="gt-val c-sum">${fmt(galResult.total)}</span>
+            </div>
+            <div class="gt-row gt-per">
+              <span style="color:#34d399;font-size:10px">÷ PC ${pcCount} คน = ต่อคน</span>
+              <span></span><span></span><span></span>
+              <span class="gt-val c-per">${fmt(galResult.perPc)} ฿</span>
+            </div>
+            ${galResult.capped?`<div class="gt-row gt-cap"><span style="font-size:10px;color:var(--red)">⚠️ ปรับเป็น Max 8,000 บาท/คน</span><span></span><span></span><span></span><span class="gt-val c-cap">8,000 ฿</span></div>`:''}
+          </div>
+        </div>
+      `}
+    </div>
+    ${qualified?`
+    <div class="total-bar">
+      <div>
+        <div class="label">💵 รวมรายได้ต่อเดือน/คน</div>
+        <div class="total-unit">Incentive + Commission + By Gallon</div>
+      </div>
+      <div><span class="total-value">${fmt(totalIncome)}</span><span class="total-unit"> ฿</span></div>
+    </div>`:''}
+  `;
+}
+</script>
+</body>
+</html>
